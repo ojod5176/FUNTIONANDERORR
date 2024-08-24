@@ -1,39 +1,40 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.0;
 
-error CANT_WIDTHDREW_THIS_AMOUNT();
-error BALANCEOF_OWNER_MOST_BE_MORE_THAN_ZERO();
+contract SimpleContract {
+    uint256 public value;
 
-contract FunctionANDError {
-    mapping(address => uint256) user;
-    address owner;
-    
-    modifier onlyowner() {
-        require(msg.sender == owner, "your not the owner on this contract");
-        _;
+    function setValue(uint256 newValue) public {
+        require(newValue > 0, "Value must be greater than 0");
+        value = newValue;
     }
 
-    constructor() {
-        owner = msg.sender;
+    function checkValue() public view {
+        assert(value < 100);
     }
 
-    function chick(address _userIf, uint256 _num) external payable {
-        require(_userIf == address(0), "address zero not valid");
-        require(msg.value > 0, "amount most be more than zero");
-        user[_userIf] += _num;
-    }
-
-    function merro(address _address) public view returns (uint256) {
-        if (_address == address(0)) {
-            revert("adderss zero not valid");
+    function resetValue() public {
+        if (value == 0) {
+            revert("Value is already 0");
         }
-        return user[_address];
+        value = 0;
     }
 
-    function payuser(uint256 _amount) external onlyowner{
-        assert(user[msg.sender] >= _amount);
+    function increment() public {
+        require(value < 10, "Value must be less than 10 to increment");
+        value += 1;
+    }
 
-        user[msg.sender] -= _amount;
-        payable(msg.sender).transfer(_amount);
+    function doubleValue() public {
+        uint256 newValue = value * 2;
+        if (newValue > 200) {
+            revert("Doubling the value would exceed the limit of 200");
+        }
+        value = newValue;
+    }
+
+    function halveValue() public {
+        require(value > 1, "Value must be greater than 1 to halve");
+        value /= 2;
     }
 }
